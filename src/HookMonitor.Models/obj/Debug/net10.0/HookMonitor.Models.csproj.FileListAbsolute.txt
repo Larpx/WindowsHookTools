@@ -1,0 +1,11 @@
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\bin\Debug\net10.0\HookMonitor.Models.deps.json
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\bin\Debug\net10.0\HookMonitor.Models.dll
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\bin\Debug\net10.0\HookMonitor.Models.pdb
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.GeneratedMSBuildEditorConfig.editorconfig
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.AssemblyInfoInputs.cache
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.AssemblyInfo.cs
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.csproj.CoreCompileInputs.cache
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.dll
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\refint\HookMonitor.Models.dll
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\HookMonitor.Models.pdb
+d:\Work\repos\WindowsHookTools\src\HookMonitor.Models\obj\Debug\net10.0\ref\HookMonitor.Models.dll

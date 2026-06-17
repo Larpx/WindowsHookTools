@@ -1,0 +1,3 @@
+LIBRARY HookMonitorAgent
+EXPORTS
+    ; 不导出任何函数，此DLL仅通过DllMain自动安装Hook

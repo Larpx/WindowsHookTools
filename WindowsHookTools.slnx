@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/HookMonitor.Core/HookMonitor.Core.csproj" />
+    <Project Path="src/HookMonitor.GUI/HookMonitor.GUI.csproj" />
+    <Project Path="src/HookMonitor.Models/HookMonitor.Models.csproj" />
+    <Project Path="src/HookMonitor.Services/HookMonitor.Services.csproj" />
+    <Project Path="src/HookMonitor.Tests/HookMonitor.Tests.csproj" />
+  </Folder>
+</Solution>
