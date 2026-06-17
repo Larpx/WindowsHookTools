@@ -106,6 +106,27 @@ public static class NtApi
 
     #endregion
 
+    #region 线程操作
+
+    /// <summary>
+    /// 打开线程
+    /// </summary>
+    [DllImport(KERNEL32, SetLastError = true)]
+    public static extern IntPtr OpenThread(
+        uint dwDesiredAccess,
+        bool bInheritHandle,
+        int dwThreadId);
+
+    /// <summary>
+    /// 等待对象信号
+    /// </summary>
+    [DllImport(KERNEL32, SetLastError = true)]
+    public static extern uint WaitForSingleObject(
+        IntPtr hHandle,
+        uint dwMilliseconds);
+
+    #endregion
+
     #region 辅助方法
 
     /// <summary>

@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using HookMonitor.Core;
+using HookMonitor.Core.Hooking;
 using HookMonitor.Core.Monitoring;
 using HookMonitor.Models;
 using Microsoft.Extensions.Logging;
@@ -18,6 +19,7 @@ public class MonitoringService : IDisposable
 
     private readonly HandleMonitor _handleMonitor;
     private readonly EtwMonitor _etwMonitor;
+    private readonly HookPipeServer? _hookPipeServer;
 
     private CancellationTokenSource? _cts;
     private Task? _monitoringTask;
@@ -48,6 +50,13 @@ public class MonitoringService : IDisposable
         _config = config ?? new MonitorConfig();
         _handleMonitor = new HandleMonitor();
         _etwMonitor = new EtwMonitor();
+
+        // 初始化IAT Hook管道服务端
+        if (_config.EnableIatHook)
+        {
+            _hookPipeServer = new HookPipeServer();
+            _hookPipeServer.ApiCallReceived += OnHookPipeApiCallReceived;
+        }
     }
 
     /// <summary>
@@ -75,6 +84,21 @@ public class MonitoringService : IDisposable
                     }
                 }
 
+                // 启动IAT Hook管道监听
+                if (_config.EnableIatHook && _hookPipeServer != null)
+                {
+                    var pipeStarted = _hookPipeServer.Start();
+                    Status.IsIatHookActive = pipeStarted;
+                    if (!pipeStarted)
+                    {
+                        _logger.LogWarning("IAT Hook管道服务启动失败");
+                    }
+                    else
+                    {
+                        _logger.LogInformation("IAT Hook管道服务已启动，等待注入DLL连接");
+                    }
+                }
+
                 // 启动主监控循环（异步）
                 _monitoringTask = MonitoringLoopAsync(_cts.Token);
 
@@ -82,7 +106,11 @@ public class MonitoringService : IDisposable
                 Status.StartTime = DateTime.UtcNow;
                 Status.IsHandleScanActive = _config.EnableHandleScan;
 
-                _logger.LogInformation("监控服务已启动，扫描间隔: {Interval}秒", _config.ScanIntervalSeconds);
+                if (_logger.IsEnabled(LogLevel.Information))
+                {
+                    _logger.LogInformation("监控服务已启动，扫描间隔: {Interval}秒", _config.ScanIntervalSeconds);
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -113,6 +141,13 @@ public class MonitoringService : IDisposable
                 {
                     _etwMonitor.Stop();
                     Status.IsEtwActive = false;
+                }
+
+                // 停止IAT Hook管道监听
+                if (_config.EnableIatHook && _hookPipeServer != null)
+                {
+                    _hookPipeServer.Stop();
+                    Status.IsIatHookActive = false;
                 }
 
                 Status.IsRunning = false;
@@ -286,10 +321,32 @@ public class MonitoringService : IDisposable
         return _threatDetectionService.GetSuspiciousProcesses();
     }
 
+    /// <summary>
+    /// IAT Hook管道数据接收回调
+    /// 将管道收到的API调用报告送入威胁检测流水线
+    /// </summary>
+    private void OnHookPipeApiCallReceived(object? sender, ApiCallRecord record)
+    {
+        try
+        {
+            _threatDetectionService.AnalyzeApiCalls([record]);
+            Status.TotalApiCallsCaptured++;
+
+            _logger.LogDebug(
+                "IAT Hook捕获: PID={ProcessId} 进程={ProcessName} API={ApiName} 详情={Detail}",
+                record.ProcessId, record.ProcessName, record.ApiName, record.Detail);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "处理IAT Hook管道数据时发生错误");
+        }
+    }
+
     public void Dispose()
     {
         Stop();
         _etwMonitor.Dispose();
+        _hookPipeServer?.Dispose();
         _cts?.Dispose();
         GC.SuppressFinalize(this);
     }
