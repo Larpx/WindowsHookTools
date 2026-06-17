@@ -75,8 +75,8 @@ public class MonitoringService : IDisposable
                     }
                 }
 
-                // 启动主监控循环
-                _monitoringTask = Task.Run(() => MonitoringLoop(_cts.Token), _cts.Token);
+                // 启动主监控循环（异步）
+                _monitoringTask = MonitoringLoopAsync(_cts.Token);
 
                 Status.IsRunning = true;
                 Status.StartTime = DateTime.UtcNow;
@@ -128,9 +128,9 @@ public class MonitoringService : IDisposable
     }
 
     /// <summary>
-    /// 主监控循环
+    /// 主监控循环（异步，避免同步阻塞）
     /// </summary>
-    private void MonitoringLoop(CancellationToken cancellationToken)
+    private async Task MonitoringLoopAsync(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
@@ -177,7 +177,7 @@ public class MonitoringService : IDisposable
                 var delay = TimeSpan.FromSeconds(_config.ScanIntervalSeconds) - elapsed;
                 if (delay > TimeSpan.Zero)
                 {
-                    Task.Delay(delay, cancellationToken).Wait(cancellationToken);
+                    await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
                 }
             }
             catch (OperationCanceledException)
@@ -190,7 +190,7 @@ public class MonitoringService : IDisposable
                 Status.ErrorMessage = ex.Message;
                 try
                 {
-                    Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).Wait(cancellationToken);
+                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {

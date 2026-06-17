@@ -1,6 +1,7 @@
 using System.Windows;
 using HookMonitor.Models;
 using HookMonitor.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -47,13 +48,22 @@ public partial class App : Application
 
     private static void ConfigureServices(IServiceCollection services)
     {
+        // 从appsettings.json读取配置
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: false)
+            .Build();
+
+        var config = new MonitorConfig();
+        configuration.GetSection("MonitorConfig").Bind(config);
+
         services.AddLogging(builder =>
         {
             builder.AddDebug();
             builder.SetMinimumLevel(LogLevel.Debug);
         });
 
-        services.AddSingleton<MonitorConfig>();
+        services.AddSingleton(config);
         services.AddSingleton<ProcessInfoService>();
         services.AddSingleton<ThreatDetectionService>();
         services.AddSingleton<MonitoringService>();

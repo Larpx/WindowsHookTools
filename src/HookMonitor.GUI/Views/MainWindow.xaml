@@ -14,6 +14,8 @@
         <converters:ThreatLevelToColorConverter x:Key="ThreatColorConverter"/>
         <converters:ThreatLevelToStringConverter x:Key="ThreatStringConverter"/>
         <converters:FileSizeConverter x:Key="FileSizeConverter"/>
+        <converters:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+        <converters:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
     </Window.Resources>
 

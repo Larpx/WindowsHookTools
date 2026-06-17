@@ -230,14 +230,162 @@ public class HandleMonitor
 
     /// <summary>
     /// 构建对象类型索引缓存
+    /// 通过NtQueryObject动态获取对象类型名称，避免硬编码索引在不同Windows版本间不一致
     /// </summary>
     private static Dictionary<byte, string> BuildObjectTypeCache()
     {
         var cache = new Dictionary<byte, string>();
 
+        try
+        {
+            // 通过NtQuerySystemInformation获取系统句柄，再通过NtQueryObject查询类型名称
+            // 先枚举当前进程的句柄来建立类型索引映射
+            var currentPid = Kernel32Api.GetCurrentProcessId();
+            var status = NtApi.NtQuerySystemInformation(
+                NtStructures.SYSTEM_INFORMATION_CLASS.SystemExtendedHandleInformation,
+                IntPtr.Zero, 0, out var requiredSize);
+
+            if (status != NtStatus.STATUS_INFO_LENGTH_MISMATCH)
+            {
+                // 回退到硬编码映射
+                return BuildFallbackObjectTypeCache();
+            }
+
+            var bufferSize = requiredSize + 65536;
+            var buffer = Marshal.AllocHGlobal(bufferSize);
+
+            try
+            {
+                status = NtApi.NtQuerySystemInformation(
+                    NtStructures.SYSTEM_INFORMATION_CLASS.SystemExtendedHandleInformation,
+                    buffer, bufferSize, out _);
+
+                if (!NtStatus.IsSuccess(status))
+                {
+                    return BuildFallbackObjectTypeCache();
+                }
+
+                var header = Marshal.PtrToStructure<NtStructures.SYSTEM_HANDLE_INFORMATION_EX>(buffer);
+                var handleCount = header.NumberOfHandles.ToInt64();
+                var entrySize = Marshal.SizeOf<NtStructures.SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX>();
+                var arrayOffset = Marshal.SizeOf<NtStructures.SYSTEM_HANDLE_INFORMATION_EX>();
+
+                // 收集所有出现过的类型索引
+                var typeIndices = new HashSet<byte>();
+                for (long i = 0; i < handleCount; i++)
+                {
+                    var entryPtr = IntPtr.Add(buffer, arrayOffset + (int)(i * entrySize));
+                    var entry = Marshal.PtrToStructure<NtStructures.SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX>(entryPtr);
+                    typeIndices.Add((byte)entry.ObjectTypeIndex);
+                }
+
+                // 对当前进程的句柄查询类型名称来建立映射
+                var currentProcessHandle = NtApi.OpenProcess(NtApi.PROCESS_QUERY_INFORMATION, false, currentPid);
+                if (currentProcessHandle != IntPtr.Zero)
+                {
+                    try
+                    {
+                        foreach (var typeIndex in typeIndices)
+                        {
+                            // 在当前进程句柄中找到该类型的句柄来查询名称
+                            for (long i = 0; i < handleCount; i++)
+                            {
+                                var entryPtr = IntPtr.Add(buffer, arrayOffset + (int)(i * entrySize));
+                                var entry = Marshal.PtrToStructure<NtStructures.SYSTEM_HANDLE_TABLE_ENTRY_INFO_EX>(entryPtr);
+
+                                if ((byte)entry.ObjectTypeIndex != typeIndex)
+                                    continue;
+
+                                // 仅查询当前进程的句柄
+                                if (entry.UniqueProcessId.ToInt32() != currentPid)
+                                    continue;
+
+                                var typeName = QueryObjectTypeName(entry.HandleValue);
+                                if (!string.IsNullOrEmpty(typeName))
+                                {
+                                    cache[typeIndex] = typeName;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        NtApi.CloseHandle(currentProcessHandle);
+                    }
+                }
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
+        catch
+        {
+            // 动态获取失败，回退到硬编码映射
+            return BuildFallbackObjectTypeCache();
+        }
+
+        // 如果动态获取结果太少，补充硬编码映射
+        if (cache.Count < 5)
+        {
+            return BuildFallbackObjectTypeCache();
+        }
+
+        return cache;
+    }
+
+    /// <summary>
+    /// 查询对象类型名称
+    /// </summary>
+    private static string? QueryObjectTypeName(IntPtr handle)
+    {
+        try
+        {
+            var status = NtApi.NtQueryObject(
+                handle,
+                NtApi.ObjectTypeInformation,
+                IntPtr.Zero, 0, out var requiredSize);
+
+            if (status != NtStatus.STATUS_INFO_LENGTH_MISMATCH)
+                return null;
+
+            var buffer = Marshal.AllocHGlobal(requiredSize + 256);
+            try
+            {
+                status = NtApi.NtQueryObject(
+                    handle,
+                    NtApi.ObjectTypeInformation,
+                    buffer, requiredSize + 256, out _);
+
+                if (!NtStatus.IsSuccess(status))
+                    return null;
+
+                // OBJECT_TYPE_INFORMATION 结构体的第一个字段是 UNICODE_STRING TypeName
+                var us = Marshal.PtrToStructure<NtStructures.UNICODE_STRING>(buffer);
+                return NtApi.ReadLocalUnicodeString(us);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 回退的硬编码对象类型索引映射
+    /// 仅在动态获取失败时使用
+    /// </summary>
+    private static Dictionary<byte, string> BuildFallbackObjectTypeCache()
+    {
+        var cache = new Dictionary<byte, string>();
+
         // Windows常见的对象类型索引映射
         // 注意：这些索引在不同Windows版本间可能不同
-        // 实际使用时应通过NtQueryObject动态获取
         cache[0x02] = "Directory";
         cache[0x03] = "SymbolicLink";
         cache[0x04] = "Token";

@@ -293,21 +293,41 @@ public class ProcessScanner
     }
 
     /// <summary>
-    /// 获取进程架构
+    /// 获取进程架构（通过IsWow64Process判断目标进程是否为32位）
     /// </summary>
     private string? GetProcessArchitecture(int processId)
     {
         try
         {
-            using var process = Process.GetProcessById(processId);
-            // .NET 10 中可通过 ProcessThread 获取架构信息
-            return Environment.Is64BitProcess ? "x64" : "x86";
+            var handle = NtApi.OpenProcess(NtApi.PROCESS_QUERY_LIMITED_INFORMATION, false, processId);
+            if (handle == IntPtr.Zero)
+                return null;
+
+            try
+            {
+                // IsWow64Process：如果目标进程是32位运行在64位系统上，则返回true
+                if (IsWow64Process(handle, out var isWow64))
+                {
+                    if (isWow64)
+                        return "x86"; // 32位进程运行在64位系统上
+                    return Environment.Is64BitOperatingSystem ? "x64" : "x86";
+                }
+                return null;
+            }
+            finally
+            {
+                NtApi.CloseHandle(handle);
+            }
         }
         catch
         {
             return null;
         }
     }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWow64Process(IntPtr hProcess, out bool wow64Process);
 }
 
 /// <summary>
