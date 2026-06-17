@@ -12,5 +12,19 @@ public enum DetectionSource
     /// <summary>IAT Hook拦截</summary>
     IatHook = 2,
     /// <summary>行为模式分析</summary>
-    BehaviorAnalysis = 3
+    BehaviorAnalysis = 3,
+    /// <summary>WFP网络过滤器检测</summary>
+    WfpDetection = 4,
+    /// <summary>DNS查询监控</summary>
+    DnsMonitor = 5,
+    /// <summary>网络连接监控</summary>
+    NetworkMonitor = 6,
+    /// <summary>Winsock LSP检测</summary>
+    LspDetection = 7,
+    /// <summary>DLL注入检测</summary>
+    InjectDetection = 8,
+    /// <summary>代理配置检测</summary>
+    ProxyDetection = 9,
+    /// <summary>内核驱动检测</summary>
+    DriverDetection = 10
 }

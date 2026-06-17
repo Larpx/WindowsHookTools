@@ -199,8 +199,170 @@ public class ThreatDetectionService
     }
 
     /// <summary>
-    /// 移除已不存在的可疑进程
+    /// 分析DNS查询记录，检测DNS劫持/重定向
     /// </summary>
+    public void AnalyzeDnsQueries(List<DnsQueryRecord> records)
+    {
+        var suspiciousRecords = records
+            .Where(r => r.IsSuspicious)
+            .ToList();
+
+        if (suspiciousRecords.Count == 0)
+            return;
+
+        // 按进程分组统计
+        var processGroups = suspiciousRecords
+            .GroupBy(r => r.ProcessId)
+            .Where(g => g.Key > 0);
+
+        foreach (var group in processGroups)
+        {
+            var processId = group.Key;
+            var dnsQueries = group.ToList();
+            var processName = dnsQueries.First().ProcessName;
+
+            // 获取或创建可疑进程记录
+            var suspicious = _suspiciousProcesses.GetOrAdd(processId, _ =>
+            {
+                var info = new SuspiciousProcessInfo
+                {
+                    ProcessId = processId,
+                    ProcessName = processName,
+                    FirstDetected = DateTime.UtcNow
+                };
+                return info;
+            });
+
+            suspicious.LastDetected = DateTime.UtcNow;
+
+            // 添加DNS相关的API调用记录
+            foreach (var query in dnsQueries)
+            {
+                suspicious.ApiCalls.Add(new ApiCallRecord
+                {
+                    ProcessId = processId,
+                    ProcessName = processName,
+                    Category = ApiCategory.DnsInterception,
+                    ApiName = "DNS Query",
+                    Timestamp = query.Timestamp,
+                    Source = DetectionSource.DnsMonitor,
+                    Detail = $"域名: {query.QueryName} → DNS服务器: {query.DnsServer} ({query.SuspicionReason})"
+                });
+            }
+
+            // 添加检测原因
+            var reason = $"DNS查询异常: {dnsQueries.Count}次查询被重定向到非标准DNS服务器";
+            if (!suspicious.DetectionReasons.Contains(reason))
+                suspicious.DetectionReasons.Add(reason);
+
+            // 提高威胁评分
+            suspicious.ThreatScore = Math.Min(suspicious.ThreatScore + dnsQueries.Count * 2, 100);
+            suspicious.ThreatLevel = suspicious.ThreatScore switch
+            {
+                >= 80 => ThreatLevel.Critical,
+                >= 60 => ThreatLevel.High,
+                >= 40 => ThreatLevel.Medium,
+                >= 20 => ThreatLevel.Low,
+                _ => ThreatLevel.None
+            };
+
+            if (_logger.IsEnabled(LogLevel.Warning))
+            {
+                _logger.LogWarning("DNS劫持检测: PID={ProcessId} 进程={ProcessName} 异常查询数={Count}",
+                    processId, processName, dnsQueries.Count);
+            }
+        }
+
+        // 限制API调用记录数
+        foreach (var (pid, process) in _suspiciousProcesses)
+        {
+            if (process.ApiCalls.Count > _config.MaxApiCallRecords)
+            {
+                process.ApiCalls = process.ApiCalls
+                    .OrderByDescending(c => c.Timestamp)
+                    .Take(_config.MaxApiCallRecords / 2)
+                    .ToList();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 分析网络连接记录，检测代理转发和流量劫持
+    /// </summary>
+    public void AnalyzeNetworkConnections(List<NetworkConnectionRecord> records)
+    {
+        var suspiciousRecords = records
+            .Where(r => r.IsSuspiciousProxy)
+            .ToList();
+
+        if (suspiciousRecords.Count == 0)
+            return;
+
+        // 按进程分组统计
+        var processGroups = suspiciousRecords
+            .GroupBy(r => r.ProcessId)
+            .Where(g => g.Key > 0);
+
+        foreach (var group in processGroups)
+        {
+            var processId = group.Key;
+            var connections = group.ToList();
+            var processName = connections.First().ProcessName;
+
+            var suspicious = _suspiciousProcesses.GetOrAdd(processId, _ =>
+            {
+                var info = new SuspiciousProcessInfo
+                {
+                    ProcessId = processId,
+                    ProcessName = processName,
+                    FirstDetected = DateTime.UtcNow
+                };
+                return info;
+            });
+
+            suspicious.LastDetected = DateTime.UtcNow;
+
+            // 添加网络连接相关的API调用记录
+            foreach (var conn in connections)
+            {
+                suspicious.ApiCalls.Add(new ApiCallRecord
+                {
+                    ProcessId = processId,
+                    ProcessName = processName,
+                    Category = ApiCategory.NetworkConnection,
+                    ApiName = conn.Protocol == "TCP" ? "TCP Connect" : "TCP Accept",
+                    Timestamp = conn.Timestamp,
+                    Source = DetectionSource.NetworkMonitor,
+                    Detail = $"{conn.RemoteAddress}:{conn.RemotePort} ({conn.SuspicionReason})"
+                });
+            }
+
+            // 添加检测原因
+            var reason = $"网络连接异常: {connections.Count}次可疑代理连接 (端口: {string.Join(", ", connections.Select(c => c.RemotePort).Distinct().Take(5))})";
+            if (!suspicious.DetectionReasons.Contains(reason))
+                suspicious.DetectionReasons.Add(reason);
+
+            // 提高威胁评分
+            suspicious.ThreatScore = Math.Min(suspicious.ThreatScore + connections.Count * 3, 100);
+            suspicious.ThreatLevel = suspicious.ThreatScore switch
+            {
+                >= 80 => ThreatLevel.Critical,
+                >= 60 => ThreatLevel.High,
+                >= 40 => ThreatLevel.Medium,
+                >= 20 => ThreatLevel.Low,
+                _ => ThreatLevel.None
+            };
+
+            if (_logger.IsEnabled(LogLevel.Warning))
+            {
+                _logger.LogWarning("网络代理检测: PID={ProcessId} 进程={ProcessName} 可疑连接数={Count}",
+                    processId, processName, connections.Count);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 移除已不存在的可疑进程</summary>
     public void RemoveStaleProcesses(HashSet<int> activeProcessIds)
     {
         foreach (var pid in _suspiciousProcesses.Keys)
