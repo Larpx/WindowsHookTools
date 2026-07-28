@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// ETW事件监控器，通过Windows事件追踪检测可疑API调用

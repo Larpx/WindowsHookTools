@@ -1,4 +1,4 @@
-namespace HookMonitor.Models;
+namespace Larpx.PersonalTools.HookMonitor.Models;
 
 /// <summary>
 /// API调用记录，记录一次被监控API的调用

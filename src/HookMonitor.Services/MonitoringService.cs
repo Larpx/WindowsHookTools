@@ -1,11 +1,11 @@
 using System.Collections.Concurrent;
-using HookMonitor.Core;
-using HookMonitor.Core.Hooking;
-using HookMonitor.Core.Monitoring;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Core;
+using Larpx.PersonalTools.HookMonitor.Core.Hooking;
+using Larpx.PersonalTools.HookMonitor.Core.Monitoring;
+using Larpx.PersonalTools.HookMonitor.Models;
 using Microsoft.Extensions.Logging;
 
-namespace HookMonitor.Services;
+namespace Larpx.PersonalTools.HookMonitor.Services;
 
 /// <summary>
 /// 监控管理服务，协调各监控组件的运行

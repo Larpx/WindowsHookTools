@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Runtime.Versioning;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// DNS查询事件监控器，通过ETW (Microsoft-Windows-DNS-Client) 监控DNS查询

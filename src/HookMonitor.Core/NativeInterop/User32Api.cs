@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// User32 API P/Invoke声明，用于窗口和截屏相关检测

@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// Kernel32 API P/Invoke声明

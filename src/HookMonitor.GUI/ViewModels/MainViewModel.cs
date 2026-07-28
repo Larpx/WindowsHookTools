@@ -3,10 +3,10 @@ using System.Windows;
 using System.Windows.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using HookMonitor.Models;
-using HookMonitor.Services;
+using Larpx.PersonalTools.HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Services;
 
-namespace HookMonitor.GUI.ViewModels;
+namespace Larpx.PersonalTools.HookMonitor.GUI.ViewModels;
 
 /// <summary>
 /// 主窗口视图模型

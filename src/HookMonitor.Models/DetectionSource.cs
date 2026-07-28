@@ -1,4 +1,4 @@
-namespace HookMonitor.Models;
+namespace Larpx.PersonalTools.HookMonitor.Models;
 
 /// <summary>
 /// 检测来源

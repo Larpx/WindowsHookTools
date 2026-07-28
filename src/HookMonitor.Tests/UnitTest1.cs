@@ -1,9 +1,9 @@
-using HookMonitor.Core;
-using HookMonitor.Core.Hooking;
-using HookMonitor.Models;
-using HookMonitor.Services;
+using Larpx.PersonalTools.HookMonitor.Core;
+using Larpx.PersonalTools.HookMonitor.Core.Hooking;
+using Larpx.PersonalTools.HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Services;
 
-namespace HookMonitor.Tests;
+namespace Larpx.PersonalTools.HookMonitor.Tests;
 
 /// <summary>
 /// CriticalProcessProvider单元测试

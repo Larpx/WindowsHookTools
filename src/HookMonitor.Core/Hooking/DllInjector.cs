@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using HookMonitor.Core.NativeInterop;
+using Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
-namespace HookMonitor.Core.Hooking;
+namespace Larpx.PersonalTools.HookMonitor.Core.Hooking;
 
 /// <summary>
 /// DLL注入器，将监控DLL注入到目标进程中

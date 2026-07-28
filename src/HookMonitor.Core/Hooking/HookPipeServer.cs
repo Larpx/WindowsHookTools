@@ -1,8 +1,8 @@
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Hooking;
+namespace Larpx.PersonalTools.HookMonitor.Core.Hooking;
 
 /// <summary>
 /// IAT Hook命名管道服务端

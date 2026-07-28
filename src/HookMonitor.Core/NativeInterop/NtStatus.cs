@@ -1,4 +1,4 @@
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// NT状态码定义，来自ntstatus.h

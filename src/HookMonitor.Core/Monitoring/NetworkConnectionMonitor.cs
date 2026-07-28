@@ -1,8 +1,8 @@
 using System.Collections.Concurrent;
 using System.Runtime.Versioning;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// TCP/UDP网络连接监控器，通过ETW (Microsoft-Windows-TCPIP) 监控网络连接

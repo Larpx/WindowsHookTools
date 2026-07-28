@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using HookMonitor.Core.NativeInterop;
+using Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
-namespace HookMonitor.Core.Hooking;
+namespace Larpx.PersonalTools.HookMonitor.Core.Hooking;
 
 /// <summary>
 /// IAT（Import Address Table）Hook引擎

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// GDI相关API P/Invoke声明，用于截屏检测

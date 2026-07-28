@@ -3,10 +3,10 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Text;
-using HookMonitor.Core.NativeInterop;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// 进程扫描器，使用底层NT API枚举系统进程并收集详细信息

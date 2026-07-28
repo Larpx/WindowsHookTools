@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// NT底层API P/Invoke声明，优先使用ntdll.dll而非高级Win32 API

@@ -2,9 +2,9 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.GUI.Converters;
+namespace Larpx.PersonalTools.HookMonitor.GUI.Converters;
 
 /// <summary>
 /// 威胁等级到颜色转换器

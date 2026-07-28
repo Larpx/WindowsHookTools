@@ -1,11 +1,11 @@
 using System.Windows;
-using HookMonitor.Models;
-using HookMonitor.Services;
+using Larpx.PersonalTools.HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace HookMonitor.GUI;
+namespace Larpx.PersonalTools.HookMonitor.GUI;
 
 /// <summary>
 /// 应用程序入口

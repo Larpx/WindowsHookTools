@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// Winsock LSP (Layered Service Provider) 检测器

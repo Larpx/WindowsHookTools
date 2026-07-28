@@ -1,4 +1,4 @@
-namespace HookMonitor.Models;
+namespace Larpx.PersonalTools.HookMonitor.Models;
 
 /// <summary>
 /// 网络连接记录，记录TCP/UDP连接事件

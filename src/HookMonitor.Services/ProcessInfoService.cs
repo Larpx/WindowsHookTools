@@ -1,10 +1,10 @@
 using System.Diagnostics;
-using HookMonitor.Core;
-using HookMonitor.Core.Monitoring;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Core;
+using Larpx.PersonalTools.HookMonitor.Core.Monitoring;
+using Larpx.PersonalTools.HookMonitor.Models;
 using Microsoft.Extensions.Logging;
 
-namespace HookMonitor.Services;
+namespace Larpx.PersonalTools.HookMonitor.Services;
 
 /// <summary>
 /// 进程信息服务，收集和缓存进程详细信息

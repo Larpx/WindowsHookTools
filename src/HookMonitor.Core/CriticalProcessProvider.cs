@@ -1,4 +1,4 @@
-namespace HookMonitor.Core;
+namespace Larpx.PersonalTools.HookMonitor.Core;
 
 /// <summary>
 /// 系统关键进程名单提供者，用于安全过滤

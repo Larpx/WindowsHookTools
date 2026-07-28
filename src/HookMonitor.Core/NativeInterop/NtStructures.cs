@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace HookMonitor.Core.NativeInterop;
+namespace Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
 
 /// <summary>
 /// NT API 相关结构体定义

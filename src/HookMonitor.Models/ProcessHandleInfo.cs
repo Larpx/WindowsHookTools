@@ -1,4 +1,4 @@
-namespace HookMonitor.Models;
+namespace Larpx.PersonalTools.HookMonitor.Models;
 
 /// <summary>
 /// 进程句柄信息，用于句柄扫描分析

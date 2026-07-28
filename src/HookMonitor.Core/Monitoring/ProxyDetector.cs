@@ -1,8 +1,8 @@
 using System.Runtime.Versioning;
 using Microsoft.Win32;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// 系统代理配置检测器

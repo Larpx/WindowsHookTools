@@ -1,8 +1,8 @@
 using System.Runtime.InteropServices;
-using HookMonitor.Core.NativeInterop;
-using HookMonitor.Models;
+using Larpx.PersonalTools.HookMonitor.Core.NativeInterop;
+using Larpx.PersonalTools.HookMonitor.Models;
 
-namespace HookMonitor.Core.Monitoring;
+namespace Larpx.PersonalTools.HookMonitor.Core.Monitoring;
 
 /// <summary>
 /// 句柄监控器，通过NtQuerySystemInformation枚举系统句柄

@@ -1,7 +1,7 @@
 using System.Windows;
-using HookMonitor.GUI.ViewModels;
+using Larpx.PersonalTools.HookMonitor.GUI.ViewModels;
 
-namespace HookMonitor.GUI.Views;
+namespace Larpx.PersonalTools.HookMonitor.GUI.Views;
 
 /// <summary>
 /// 主窗口
